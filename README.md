@@ -1,6 +1,6 @@
 ## Notion Auto Summariser (n8n Workflow)
 
-Automatically summarise your Notion pages with n8n + Google Gemini (PaLM).
+Automatically summarise your Notion pages with n8n + Google Gemini(any llms).
 This workflow watches for new or updated pages in your Notion database, extracts their content, sends it to Gemini for summarisation, and appends the summary back into the same page.
 
 🚀 Features
@@ -9,7 +9,7 @@ This workflow watches for new or updated pages in your Notion database, extracts
 
 📑 Content aggregation: Collects all child blocks into one text file.
 
-🤖 AI-powered summarisation: Uses Google Gemini (PaLM) to generate concise summaries.
+🤖 AI-powered summarisation: Uses Google Gemini to generate concise summaries. Can be set for another LLM's.
 
 📝 In-page summary: Appends the generated summary to the bottom of the same Notion page.
 
@@ -23,24 +23,24 @@ n8n
 
 A Notion API integration with access to your database.
 
-A Google Gemini (PaLM) API key.
+A Google Gemini API key.
 
 2. Import the Workflow
 
 Clone this repo:
 
-git clone https://github.com/YOUR_USERNAME/notion-auto-summariser-n8n.git
+git clone https://github.com/Vinay-kumar-code/Notion-Notes-AI-Summariser-N8N
 
 
 In your n8n dashboard, go to Workflows → Import → From File.
 
-Select the Notion Notes automatic summariser.json file.
+Select the json file from this repo.
 
 3. Configure Credentials
 
 Notion API: Add your integration token in n8n’s Credentials → Notion.
 
-Google Gemini (PaLM): Add your API key in Credentials → Google PaLM API.
+Google Gemini: Add your API key in Credentials → Google PaLM API.
 
 4. Run It
 
@@ -64,7 +64,8 @@ Append: Writes the summary back into the Notion page.
 
 📸 Screenshots
 
-(Add screenshots of your workflow canvas and a Notion page before/after summarisation here.)
+<img width="1577" height="693" alt="image" src="https://github.com/user-attachments/assets/78b46547-ed84-41c4-8e3e-12c20b95c47c" />
+
 
 🔮 Future Improvements
 
@@ -76,4 +77,9 @@ Custom summary length (short, medium, detailed).
 
 📜 License
 
-MIT License. Free to use, modify, and share.
+GNU Public License. Free to use, modify, and share.
+
+
+If you like my work, feel free to star the repo.
+
+Open for contributions to this repo.
