@@ -1,0 +1,274 @@
+{
+  "name": "Notion Notes automatic summariser",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "event": "pagedUpdatedInDatabase",
+        "databaseId": {
+          "__rl": true,
+          "value": "cc3bd508-b2c3-46c5-a0ef-ac6444946c2d",
+          "mode": "list",
+          "cachedResultName": "Notes",
+          "cachedResultUrl": "https://www.notion.so/cc3bd508b2c346c5a0efac6444946c2d"
+        }
+      },
+      "type": "n8n-nodes-base.notionTrigger",
+      "typeVersion": 1,
+      "position": [
+        -384,
+        -208
+      ],
+      "id": "ca206e14-2a22-4d9b-aa4a-dcf124567932",
+      "name": "Notion Trigger",
+      "credentials": {
+        "notionApi": {
+          "id": "AL7Ppr7M3jFSxIbh",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "get",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -128,
+        -208
+      ],
+      "id": "c42b2d17-e100-4601-9181-f0cb434db3fa",
+      "name": "Get a database page",
+      "credentials": {
+        "notionApi": {
+          "id": "AL7Ppr7M3jFSxIbh",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "block",
+        "operation": "getAll",
+        "blockId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        144,
+        -208
+      ],
+      "id": "8e2311e7-5eba-4be7-8de4-8d33ce01ba47",
+      "name": "Get many child blocks",
+      "credentials": {
+        "notionApi": {
+          "id": "AL7Ppr7M3jFSxIbh",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "block",
+        "blockId": {
+          "__rl": true,
+          "value": "={{ $('Get a database page').item.json.id }}",
+          "mode": "id"
+        },
+        "blockUi": {
+          "blockValues": [
+            {
+              "type": "heading_1",
+              "textContent": "=Summary"
+            },
+            {
+              "textContent": "={{ $json.content.parts[0].text }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1312,
+        -208
+      ],
+      "id": "4ded8246-ca62-4677-a70c-2f84ef020888",
+      "name": "Append a block",
+      "credentials": {
+        "notionApi": {
+          "id": "AL7Ppr7M3jFSxIbh",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemma-3-27b-it",
+          "mode": "list",
+          "cachedResultName": "models/gemma-3-27b-it"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.textFile }}"
+            },
+            {
+              "content": "Summarise the text and if sufficient text is not there to summarise just say \"Very small text to summarise\""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        864,
+        -208
+      ],
+      "id": "8f97dbf4-41ca-4e10-93b0-668d1cb401e9",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "WM8H5oCGBM12XVI1",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "content"
+            }
+          ]
+        },
+        "options": {
+          "mergeLists": true
+        }
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        352,
+        -208
+      ],
+      "id": "3c0975e2-d039-4c59-b534-0964a31fa053",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $items();\n\n// Join all \"content\" fields into one string (newline separated)\nconst text = items.map(item => item.json.content).join(\"\\n\");\n\n// Return as a single item\nreturn [{\n  json: {\n    textFile: text\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        -208
+      ],
+      "id": "ef83da5b-1e9e-43e3-a800-1188596cbabf",
+      "name": "Code"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Notion Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get a database page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a database page": {
+      "main": [
+        [
+          {
+            "node": "Get many child blocks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many child blocks": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Append a block",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "df45e481-7f89-4824-8161-b55e9bd0937b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "784b35d6c527fa8a569de3e1ae08d1437f562638a0dee8dbc6272d4251984db5"
+  },
+  "id": "XBU6sKtlSx8f35DC",
+  "tags": []
+}
